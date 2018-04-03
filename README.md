@@ -10,32 +10,14 @@ This solution transpiles Golang into Arduino code, which can be compiled to an i
 Now I am able to use a fully automated testing approach instead of doing it 100% manually.
 
 **Important**: The Transpiler only supports a small subset of the [Golang Language Specification](https://golang.org/ref/spec).
-Look at the tests in <code>infrastructure/ino/worker_test.go</code> for more information.
 
 ## Installation
 
-First install necessary packages by using:
-
-    make packages
-
-## Test and Build
-
-Now Build the transpiler executable by running:
-
-    make
-
-## Install
-
-Copy the transpiler executable into your <code>$GOPATH/bin</code> directory.
-Then copy the file which will be used as mapping Golang to Arduino-API:
-
-    make install
+    go get -u github.com/andygeiss/esp32-transpiler
 
 ## Usage
 
     Usage of esp32-transpiler:
-      -mapping string
-            API Mapping file (default "/home/user/esp32/mapping.json")
       -source string
             Golang source file
       -target string
