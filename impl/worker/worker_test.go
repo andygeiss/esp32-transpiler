@@ -1,8 +1,9 @@
-package worker
+package worker_test
 
 import (
 	"bytes"
 	. "github.com/andygeiss/assert"
+	"github.com/andygeiss/esp32-transpiler/impl/worker"
 	"strings"
 	"testing"
 )
@@ -20,11 +21,9 @@ func Trim(s string) string {
 // The Worker will be started and used to transform the source into an Arduino sketch format.
 func Validate(source, expected string, t *testing.T) {
 	var in, out bytes.Buffer
-	mapping := NewMapping("mapping.json")
-	Assert(t, mapping.Read(), IsNil())
 	in.WriteString(source)
-	worker := NewWorker(&in, &out, mapping)
-	Assert(t, worker.Start(), IsNil())
+	wrk := worker.NewWorker(&in, &out, worker.NewMapping())
+	Assert(t, wrk.Start(), IsNil())
 	code := out.String()
 	tcode, texpected := Trim(code), Trim(expected)
 	Assert(t, tcode, IsEqual(texpected))

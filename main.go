@@ -10,24 +10,23 @@ import (
 )
 
 func main() {
-	mapping, source, target := getFlags()
-	checkFlagsAreValid(mapping, source, target)
-	safeTranspile(mapping, source, target)
+	source, target := getFlags()
+	checkFlagsAreValid(source, target)
+	safeTranspile(source, target)
 }
 
-func checkFlagsAreValid(mapping, source, target string) {
-	if mapping == "" || source == "" || target == "" {
+func checkFlagsAreValid(source, target string) {
+	if source == "" || target == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 }
 
-func getFlags() (string, string, string) {
-	mapping := flag.String("mapping", fmt.Sprintf("%s/esp32/mapping.json", os.Getenv("HOME")), "API Mapping file")
+func getFlags() (string, string) {
 	source := flag.String("source", "", "Golang source file")
 	target := flag.String("target", "", "Arduino sketch file")
 	flag.Parse()
-	return *mapping, *source, *target
+	return *source, *target
 }
 
 func printUsage() {
@@ -39,7 +38,7 @@ func printUsage() {
 	fmt.Printf("\tesp32 -source impl/blink/controller.go -target impl/blink/controller.worker\n\n")
 }
 
-func safeTranspile(mapping, source, target string) {
+func safeTranspile(source, target string) {
 	// Read the Golang source file.
 	in, err := os.Open(source)
 	if err != nil {
@@ -53,12 +52,8 @@ func safeTranspile(mapping, source, target string) {
 		log.Fatal("Arduino sketch file [%s] could not be opened! %v", target, err)
 	}
 	// Transpiles the Golang source into Arduino sketch.
-	m := worker.NewMapping(mapping)
-	if err := m.Read(); err != nil {
-		log.Fatal("%v", err)
-	}
-	worker := worker.NewWorker(in, out, m)
-	trans := transpile.NewTranspiler(worker)
+	wrk := worker.NewWorker(in, out, worker.NewMapping())
+	trans := transpile.NewTranspiler(wrk)
 	if err := trans.Transpile(); err != nil {
 		log.Fatal("%v", err)
 	}
