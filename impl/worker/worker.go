@@ -1,8 +1,8 @@
-package ino
+package worker
 
 import (
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/business/worker"
+	"github.com/andygeiss/esp32-transpiler/api/worker"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -19,7 +19,7 @@ const (
 
 var mapping worker.Mapping
 
-// Worker specifies the business logic of transforming a source code format into another target format.
+// Worker specifies the api logic of transforming a source code format into another target format.
 type Worker struct {
 	in  io.Reader
 	out io.Writer

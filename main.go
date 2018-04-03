@@ -1,11 +1,11 @@
-package main
+package esp32_transpiler
 
 import (
 	"flag"
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/application/transpile"
-	"github.com/andygeiss/esp32-transpiler/infrastructure/ino"
-	"github.com/andygeiss/log"
+	"github.com/andygeiss/esp32-transpiler/impl/transpile"
+	"github.com/andygeiss/esp32-transpiler/impl/worker"
+	log "github.com/andygeiss/log/impl"
 	"os"
 )
 
@@ -36,7 +36,7 @@ func printUsage() {
 	flag.PrintDefaults()
 	fmt.Print("\n")
 	fmt.Print("Example:\n")
-	fmt.Printf("\tesp32 -source application/blink/controller.go -target application/blink/controller.ino\n\n")
+	fmt.Printf("\tesp32 -source impl/blink/controller.go -target impl/blink/controller.worker\n\n")
 }
 
 func safeTranspile(mapping, source, target string) {
@@ -53,11 +53,11 @@ func safeTranspile(mapping, source, target string) {
 		log.Fatal("Arduino sketch file [%s] could not be opened! %v", target, err)
 	}
 	// Transpiles the Golang source into Arduino sketch.
-	m := ino.NewMapping(mapping)
+	m := worker.NewMapping(mapping)
 	if err := m.Read(); err != nil {
 		log.Fatal("%v", err)
 	}
-	worker := ino.NewWorker(in, out, m)
+	worker := worker.NewWorker(in, out, m)
 	trans := transpile.NewTranspiler(worker)
 	if err := trans.Transpile(); err != nil {
 		log.Fatal("%v", err)

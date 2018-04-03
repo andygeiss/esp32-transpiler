@@ -6,7 +6,7 @@ all: clean test build install
 
 build/$(APPNAME):
 	@echo $(TS) Building $(APPAME) ...
-	@go build -ldflags $(LDFLAGS) -o build/$(APPNAME) platform/main/main.go
+	@go build -ldflags $(LDFLAGS) -o build/$(APPNAME) main.go
 	@echo $(TS) Done.
 
 build: build/$(APPNAME)
@@ -20,7 +20,7 @@ install:
 	@echo $(TS) Installing $(APPNAME) ...
 	@cp build/$(APPNAME) $(GOPATH)/bin/
 	@mkdir -p $(HOME)/esp32/
-	@cp infrastructure/ino/mapping.json $(HOME)/esp32/mapping.json
+	@cp mapping.json $(HOME)/esp32/mapping.json
 	@echo $(TS) Done.
 
 packages:

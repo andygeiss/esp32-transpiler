@@ -1,12 +1,12 @@
-package ino
+package worker
 
 import (
 	"encoding/json"
-	"github.com/andygeiss/esp32-transpiler/business/worker"
+	"github.com/andygeiss/esp32-transpiler/api/worker"
 	"io/ioutil"
 )
 
-// Mapping specifies the business logic to apply transformation to a specific Golang identifier by reading simple JSON map.
+// Mapping specifies the api logic to apply transformation to a specific Golang identifier by reading simple JSON map.
 type Mapping struct {
 	Filename string            `json:"filename"`
 	Rules    map[string]string `json:"rules"`

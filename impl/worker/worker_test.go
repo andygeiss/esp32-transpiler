@@ -1,9 +1,8 @@
-package ino_test
+package worker
 
 import (
 	"bytes"
 	. "github.com/andygeiss/assert"
-	"github.com/andygeiss/esp32-transpiler/infrastructure/ino"
 	"strings"
 	"testing"
 )
@@ -21,10 +20,10 @@ func Trim(s string) string {
 // The Worker will be started and used to transform the source into an Arduino sketch format.
 func Validate(source, expected string, t *testing.T) {
 	var in, out bytes.Buffer
-	mapping := ino.NewMapping("mapping.json")
+	mapping := NewMapping("mapping.json")
 	Assert(t, mapping.Read(), IsNil())
 	in.WriteString(source)
-	worker := ino.NewWorker(&in, &out, mapping)
+	worker := NewWorker(&in, &out, mapping)
 	Assert(t, worker.Start(), IsNil())
 	code := out.String()
 	tcode, texpected := Trim(code), Trim(expected)
@@ -222,10 +221,10 @@ func TestFunctionWithFunctionParam(t *testing.T) {
 
 func TestPackageImport(t *testing.T) {
 	source := `package test
-	import "github.com/andygeiss/esp32-mqtt/business/controller"
-	import "github.com/andygeiss/esp32-mqtt/business/controller/serial"
-	import "github.com/andygeiss/esp32/business/controller/timer"
-	import wifi "github.com/andygeiss/esp32/business/controller/wifi"
+	import "github.com/andygeiss/esp32-mqtt/api/controller"
+	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
+	import "github.com/andygeiss/esp32/api/controller/timer"
+	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
 	`
 	expected := `
 	#include <WiFi.h>
@@ -236,9 +235,9 @@ func TestPackageImport(t *testing.T) {
 func TestPackageImport_ButIgnoreController(t *testing.T) {
 	source := `package test
 	import controller "github.com/andygeiss/esp32-controller"
-	import "github.com/andygeiss/esp32-mqtt/business/controller/serial"
-	import "github.com/andygeiss/esp32/business/controller/timer"
-	import wifi "github.com/andygeiss/esp32/business/controller/wifi"
+	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
+	import "github.com/andygeiss/esp32/api/controller/timer"
+	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
 	`
 	expected := `
 	#include <WiFi.h>

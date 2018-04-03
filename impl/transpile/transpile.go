@@ -2,8 +2,8 @@ package transpile
 
 import (
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/business/transpiler"
-	"github.com/andygeiss/esp32-transpiler/business/worker"
+	"github.com/andygeiss/esp32-transpiler/api/transpiler"
+	"github.com/andygeiss/esp32-transpiler/api/worker"
 )
 
 // Transpiler uses a given worker to main source code.
