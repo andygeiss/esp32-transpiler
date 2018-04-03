@@ -1,4 +1,4 @@
-package esp32_transpiler
+package main
 
 import (
 	"flag"
