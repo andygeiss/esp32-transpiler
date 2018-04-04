@@ -1,5 +1,7 @@
 # ESP32 Transpiler
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-transpiler)](https://goreportcard.com/report/github.com/andygeiss/esp32-transpiler)
+
 ## Purpose
 
 The [Arduino IDE](https://www.arduino.cc/en/Main/Software) is easy to use.
