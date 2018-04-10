@@ -1,6 +1,7 @@
 # ESP32 Transpiler
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-transpiler)](https://goreportcard.com/report/github.com/andygeiss/esp32-transpiler)
+[![Build Status](https://travis-ci.org/andygeiss/esp32-transpiler.svg?branch=master)](https://travis-ci.org/andygeiss/esp32-transpiler)
 
 ## Purpose
 
