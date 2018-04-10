@@ -3,8 +3,8 @@ package transpile_test
 import (
 	"bytes"
 	. "github.com/andygeiss/assert"
-	"github.com/andygeiss/esp32-transpiler/impl/transpile"
 	"github.com/andygeiss/esp32-transpiler/api/worker"
+	"github.com/andygeiss/esp32-transpiler/impl/transpile"
 	"io"
 	"testing"
 )
