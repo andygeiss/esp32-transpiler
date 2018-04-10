@@ -7,6 +7,7 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -74,7 +75,7 @@ func (w *Worker) Start() error {
 		}
 	}
 	// Print the AST.
-	//ast.Fprint(os.Stderr, fset, file, nil)
+	ast.Fprint(os.Stderr, fset, file, nil)
 	return nil
 }
 
@@ -117,11 +118,19 @@ func handleBinaryExpr(expr ast.Expr) string {
 	e := expr.(*ast.BinaryExpr)
 	code := ""
 	switch x := e.X.(type) {
+	case *ast.BasicLit:
+		code += handleBasicLit(x)
+	case *ast.CallExpr:
+		code += handleCallExpr(x)
 	case *ast.Ident:
 		code += handleIdent(x)
 	}
 	code += e.Op.String()
 	switch y := e.Y.(type) {
+	case *ast.BasicLit:
+		code += handleBasicLit(y)
+	case *ast.CallExpr:
+		code += handleCallExpr(y)
 	case *ast.Ident:
 		code += handleIdent(y)
 	}
@@ -198,7 +207,7 @@ func handleFuncDecl(decl ast.Decl) string {
 	code += "("
 	code += handleFuncDeclParams(fd.Type)
 	code += ") {"
-	code += handleFuncDeclBody(fd.Body)
+	code += handleBlockStmt(fd.Body)
 	code += "}"
 	return code
 }
@@ -223,7 +232,7 @@ func handleFuncDeclParams(t *ast.FuncType) string {
 	return code
 }
 
-func handleFuncDeclBody(body *ast.BlockStmt) string {
+func handleBlockStmt(body *ast.BlockStmt) string {
 	code := ""
 	if body == nil {
 		return code
@@ -233,6 +242,8 @@ func handleFuncDeclBody(body *ast.BlockStmt) string {
 		case *ast.AssignStmt:
 			code += handleAssignStmt(s)
 			code += ";"
+		case *ast.IfStmt:
+			code += handleIfStmt(s)
 		case *ast.DeclStmt:
 			code += handleDeclStmt(s)
 		case *ast.ExprStmt:
@@ -240,6 +251,13 @@ func handleFuncDeclBody(body *ast.BlockStmt) string {
 			code += ";"
 		}
 	}
+	return code
+}
+
+func handleIfStmt(stmt *ast.IfStmt) string {
+	cond := handleBinaryExpr(stmt.Cond)
+	body := handleBlockStmt(stmt.Body)
+	code := fmt.Sprintf(`if (%s) { %s }`, cond, body)
 	return code
 }
 

@@ -29,14 +29,14 @@ func Validate(source, expected string, t *testing.T) {
 	Assert(t, tcode, IsEqual(texpected))
 }
 
-func TestEmptyPackage(t *testing.T) {
+func Test_Empty_Package(t *testing.T) {
 	source := `package test`
 	expected := `void loop(){}
 	void setup() {}	`
 	Validate(source, expected, t)
 }
 
-func TestFunctionDeclaration(t *testing.T) {
+func Test_Function_Declaration(t *testing.T) {
 	source := `package test
 	func foo() {}
 	func bar() {}
@@ -45,7 +45,7 @@ func TestFunctionDeclaration(t *testing.T) {
 	void bar() {}	`
 	Validate(source, expected, t)
 }
-func TestFunctionDeclarationWithArgs(t *testing.T) {
+func Test_Function_Declaration_With_Args(t *testing.T) {
 	source := `package test
 	func foo(x int) {}
 	func bar(y int) {}
@@ -54,7 +54,7 @@ func TestFunctionDeclarationWithArgs(t *testing.T) {
 	void bar(int y) {}	`
 	Validate(source, expected, t)
 }
-func TestConstStringDeclaration(t *testing.T) {
+func Test_Const_String_Declaration(t *testing.T) {
 	source := `package test
 	const foo string = "bar"
 	`
@@ -63,7 +63,7 @@ func TestConstStringDeclaration(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithConstStringDeclaration(t *testing.T) {
+func Test_Function_With_Const_String_Declaration(t *testing.T) {
 	source := `package test
 	func foo() {
 		const foo string = "bar"
@@ -76,7 +76,7 @@ func TestFunctionWithConstStringDeclaration(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithVarStringDeclaration(t *testing.T) {
+func Test_Function_With_Var_String_Declaration(t *testing.T) {
 	source := `package test
 	func foo() {
 		var foo string = "bar"
@@ -89,7 +89,7 @@ func TestFunctionWithVarStringDeclaration(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithFunctionCall(t *testing.T) {
+func Test_Function_With_Function_Call(t *testing.T) {
 	source := `package test
 	func foo() {
 		bar()
@@ -102,7 +102,7 @@ func TestFunctionWithFunctionCall(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithFunctionCallWithArgs(t *testing.T) {
+func Test_Function_With_Function_Call_With_Args(t *testing.T) {
 	source := `package test
 	func foo() {
 		bar(1,2,3)
@@ -115,7 +115,7 @@ func TestFunctionWithFunctionCallWithArgs(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithFunctionCallWithString(t *testing.T) {
+func Test_Function_With_Function_Call_With_String(t *testing.T) {
 	source := `package test
 	func foo() {
 		bar("foo")
@@ -129,7 +129,7 @@ func TestFunctionWithFunctionCallWithString(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func TestFunctionWithPackageFunctionCall(t *testing.T) {
+func Test_Function_With_Package_Function_Call(t *testing.T) {
 	source := `package test
 	func foo() {
 		foo.Bar(1,"2")
@@ -142,7 +142,7 @@ func TestFunctionWithPackageFunctionCall(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithAssignments(t *testing.T) {
+func Test_Function_With_Assignments(t *testing.T) {
 	source := `package test
 	func foo() {
 		x = 1
@@ -159,7 +159,7 @@ func TestFunctionWithAssignments(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithPackageSelectorAssignments(t *testing.T) {
+func Test_Function_With_Package_Selector_Assignments(t *testing.T) {
 	source := `package test
 	func foo() {
 		x = bar()
@@ -177,7 +177,7 @@ func TestFunctionWithPackageSelectorAssignments(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func TestFunctionIdentMapping(t *testing.T) {
+func Test_Function_Ident_Mapping(t *testing.T) {
 	source := `package test
 	func foo() {
 		serial.Begin()
@@ -190,7 +190,7 @@ func TestFunctionIdentMapping(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
-func TestFunctionWithIdentParam(t *testing.T) {
+func Test_Function_With_Ident_Param(t *testing.T) {
 	source := `package test
 	func foo() {
 		foo.Bar(1,"2",digital.Low)
@@ -204,7 +204,7 @@ func TestFunctionWithIdentParam(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func TestFunctionWithFunctionParam(t *testing.T) {
+func Test_Function_With_Function_Param(t *testing.T) {
 	source := `package test
 	func foo() {
 		serial.Println(wifi.LocalIP())
@@ -218,7 +218,7 @@ func TestFunctionWithFunctionParam(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func TestPackageImport(t *testing.T) {
+func Test_Package_Import(t *testing.T) {
 	source := `package test
 	import "github.com/andygeiss/esp32-mqtt/api/controller"
 	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
@@ -231,7 +231,7 @@ func TestPackageImport(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func TestPackageImport_ButIgnoreController(t *testing.T) {
+func Test_Package_Import_But_Ignore_Controller(t *testing.T) {
 	source := `package test
 	import controller "github.com/andygeiss/esp32-controller"
 	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
@@ -241,5 +241,65 @@ func TestPackageImport_ButIgnoreController(t *testing.T) {
 	expected := `
 	#include <WiFi.h>
 	`
+	Validate(source, expected, t)
+}
+
+func Test_BlockStmt_With_Condition_BasicLit_And_BasicLit(t *testing.T) {
+	source := `package test
+	func Setup() error {}
+	func Loop() error {
+		if 1 == 1 {
+			serial.Println("1")
+		}
+	}
+`
+	expected := `
+	void setup() {}
+	void loop() {
+		if (1 == 1) {
+			Serial.println("1");
+		}
+	}
+`
+	Validate(source, expected, t)
+}
+
+func Test_BlockStmt_With_Condition_Ident_And_BasicLit(t *testing.T) {
+	source := `package test
+	func Setup() error {}
+	func Loop() error {
+		if x == 1 {
+			serial.Println("1")
+		}
+	}
+`
+	expected := `
+	void setup() {}
+	void loop() {
+		if (x == 1) {
+			Serial.println("1");
+		}
+	}
+`
+	Validate(source, expected, t)
+}
+
+func Test_BlockStmt_With_Condition_CallExpr_And_BasicLit(t *testing.T) {
+	source := `package test
+	func Setup() error {}
+	func Loop() error {
+		if x() == 1 {
+			serial.Println("1")
+		}
+	}
+`
+	expected := `
+	void setup() {}
+	void loop() {
+		if (x() == 1) {
+			Serial.println("1");
+		}
+	}
+`
 	Validate(source, expected, t)
 }
