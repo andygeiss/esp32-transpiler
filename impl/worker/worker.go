@@ -78,83 +78,41 @@ func (w *Worker) Start() error {
 	return nil
 }
 
-func handleAssignStmt(stmt ast.Stmt) string {
-	a := stmt.(*ast.AssignStmt)
-	code := ""
-	code += handleAssignStmtExpr(a.Lhs)
-	code += a.Tok.String()
-	code += handleAssignStmtExpr(a.Rhs)
+func handleAssignStmt(as *ast.AssignStmt) string {
+	code := handleAssignStmtExpr(as.Lhs)
+	code += as.Tok.String()
+	code += handleAssignStmtExpr(as.Rhs)
 	return code
 }
 
-func handleAssignStmtExpr(expr []ast.Expr) string {
-	code := ""
+func handleAssignStmtExpr(e []ast.Expr) string {
 	ops := make([]string, 0)
-	for _, op := range expr {
-		switch o := op.(type) {
-		case *ast.BasicLit:
-			ops = append(ops, handleBasicLit(o))
-		case *ast.BinaryExpr:
-			ops = append(ops, handleBinaryExpr(o))
-		case *ast.CallExpr:
-			ops = append(ops, handleCallExpr(o))
-		case *ast.Ident:
-			ops = append(ops, handleIdent(o))
-		}
+	code := ""
+	for _, op := range e {
+		ops = append(ops, handleExpr(op))
 	}
 	code += strings.Join(ops, ",")
 	return code
 }
 
-func handleBasicLit(expr ast.Expr) string {
-	bl := expr.(*ast.BasicLit)
-	code := ""
-	code += bl.Value
-	return code
+func handleBasicLit(bl *ast.BasicLit) string {
+	return bl.Value
 }
 
 func handleBinaryExpr(expr ast.Expr) string {
-	e := expr.(*ast.BinaryExpr)
-	code := ""
-	switch x := e.X.(type) {
-	case *ast.BasicLit:
-		code += handleBasicLit(x)
-	case *ast.CallExpr:
-		code += handleCallExpr(x)
-	case *ast.Ident:
-		code += handleIdent(x)
-	}
-	code += e.Op.String()
-	switch y := e.Y.(type) {
-	case *ast.BasicLit:
-		code += handleBasicLit(y)
-	case *ast.CallExpr:
-		code += handleCallExpr(y)
-	case *ast.Ident:
-		code += handleIdent(y)
-	}
+	be := expr.(*ast.BinaryExpr)
+	code := handleExpr(be.X)
+	code += be.Op.String()
+	code += handleExpr(be.Y)
 	return code
 }
 
 func handleCallExpr(expr *ast.CallExpr) string {
-	code := ""
-	switch e := expr.Fun.(type) {
-	case *ast.Ident:
-		code += handleIdent(e)
-	case *ast.SelectorExpr:
-		code += handleSelectorExpr(e)
-	}
+	code := handleExpr(expr.Fun)
 	code += "("
 	args := make([]string, 0)
 	for _, arg := range expr.Args {
-		switch a := arg.(type) {
-		case *ast.BasicLit:
-			args = append(args, handleBasicLit(a))
-		case *ast.CallExpr:
-			args = append(args, handleCallExpr(a))
-		case *ast.SelectorExpr:
-			args = append(args, handleSelectorExpr(a))
-		}
+		args = append(args, handleExpr(arg))
 	}
 	code += strings.Join(args, ",")
 	code += ")"
@@ -179,6 +137,23 @@ func handleDeclStmt(stmt *ast.DeclStmt) string {
 	switch decl := stmt.Decl.(type) {
 	case *ast.GenDecl:
 		code += handleGenDecl(decl)
+	}
+	return code
+}
+
+func handleExpr(expr ast.Expr) string {
+	code := ""
+	switch e := expr.(type) {
+	case *ast.BasicLit:
+		code += handleBasicLit(e)
+	case *ast.BinaryExpr:
+		code += handleBinaryExpr(e)
+	case *ast.CallExpr:
+		code += handleCallExpr(e)
+	case *ast.Ident:
+		code += handleIdent(e)
+	case *ast.SelectorExpr:
+		code += handleSelectorExpr(e)
 	}
 	return code
 }
@@ -237,26 +212,26 @@ func handleBlockStmt(body *ast.BlockStmt) string {
 		return code
 	}
 	for _, stmt := range body.List {
-		switch s := stmt.(type) {
-		case *ast.AssignStmt:
-			code += handleAssignStmt(s)
-			code += ";"
-		case *ast.IfStmt:
-			code += handleIfStmt(s)
-		case *ast.DeclStmt:
-			code += handleDeclStmt(s)
-		case *ast.ExprStmt:
-			code += handleExprStmt(s)
-			code += ";"
-		}
+		code += handleStmt(stmt)
 	}
 	return code
 }
 
-func handleIfStmt(stmt *ast.IfStmt) string {
-	cond := handleBinaryExpr(stmt.Cond)
-	body := handleBlockStmt(stmt.Body)
-	code := fmt.Sprintf(`if (%s) { %s }`, cond, body)
+func handleBranchStmt(stmt *ast.BranchStmt) string {
+	return "break;"
+}
+
+func handleCaseClause(cc *ast.CaseClause) string {
+	code := "case "
+	clauses := make([]string, 0)
+	for _, clause := range cc.List {
+		clauses = append(clauses, handleExpr(clause))
+	}
+	code += strings.Join(clauses, ",")
+	code += ":"
+	for _, body := range cc.Body {
+		code += handleStmt(body)
+	}
 	return code
 }
 
@@ -301,6 +276,13 @@ func handleIdent(expr ast.Expr) string {
 	return code
 }
 
+func handleIfStmt(stmt *ast.IfStmt) string {
+	cond := handleBinaryExpr(stmt.Cond)
+	body := handleBlockStmt(stmt.Body)
+	code := fmt.Sprintf(`if (%s) { %s }`, cond, body)
+	return code
+}
+
 func handleImportSpec(spec ast.Spec) string {
 	s := spec.(*ast.ImportSpec)
 	code := ""
@@ -339,6 +321,38 @@ func handleSpecs(specs []ast.Spec) string {
 			code += handleValueSpec(spec) + ";"
 		}
 	}
+	return code
+}
+
+func handleStmt(stmt ast.Stmt) string {
+	code := ""
+	switch s := stmt.(type) {
+	case *ast.AssignStmt:
+		code += handleAssignStmt(s)
+		code += ";"
+	case *ast.BranchStmt:
+		code += handleBranchStmt(s)
+	case *ast.CaseClause:
+		code += handleCaseClause(s)
+	case *ast.DeclStmt:
+		code += handleDeclStmt(s)
+	case *ast.ExprStmt:
+		code += handleExprStmt(s)
+		code += ";"
+	case *ast.IfStmt:
+		code += handleIfStmt(s)
+	case *ast.SwitchStmt:
+		code += handleSwitchStmt(s)
+	}
+	return code
+}
+
+func handleSwitchStmt(stmt *ast.SwitchStmt) string {
+	code := "switch ("
+	code += handleExpr(stmt.Tag)
+	code += "){"
+	code += handleBlockStmt(stmt.Body)
+	code += "}"
 	return code
 }
 

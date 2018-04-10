@@ -159,6 +159,7 @@ func Test_Function_With_Assignments(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
+
 func Test_Function_With_Package_Selector_Assignments(t *testing.T) {
 	source := `package test
 	func foo() {
@@ -244,7 +245,7 @@ func Test_Package_Import_But_Ignore_Controller(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func Test_BlockStmt_With_Condition_BasicLit_And_BasicLit(t *testing.T) {
+func Test_IfStmt_With_Condition_BasicLit_And_BasicLit(t *testing.T) {
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -264,7 +265,7 @@ func Test_BlockStmt_With_Condition_BasicLit_And_BasicLit(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func Test_BlockStmt_With_Condition_Ident_And_BasicLit(t *testing.T) {
+func Test_IfStmt_With_Condition_Ident_And_BasicLit(t *testing.T) {
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -284,7 +285,7 @@ func Test_BlockStmt_With_Condition_Ident_And_BasicLit(t *testing.T) {
 	Validate(source, expected, t)
 }
 
-func Test_BlockStmt_With_Condition_CallExpr_And_BasicLit(t *testing.T) {
+func Test_IfStmt_With_Condition_CallExpr_And_BasicLit(t *testing.T) {
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -297,6 +298,78 @@ func Test_BlockStmt_With_Condition_CallExpr_And_BasicLit(t *testing.T) {
 	void setup() {}
 	void loop() {
 		if (x() == 1) {
+			Serial.println("1");
+		}
+	}
+`
+	Validate(source, expected, t)
+}
+
+func Test_IfStmt_With_Condition_Const_And_BasicLit(t *testing.T) {
+	source := `package test
+	const maxX = 1
+	func Setup() error {}
+	func Loop() error {
+		if x == maxX {
+			serial.Println("1")
+		}
+	}
+`
+	expected := `
+	const maxX = 1;
+	void setup() {}
+	void loop() {
+		if (x == maxX) {
+			Serial.println("1");
+		}
+	}
+`
+	Validate(source, expected, t)
+}
+
+func Test_SwitchStmt_With_Ident_And_BasicLit(t *testing.T) {
+	source := `package test
+	func Setup() error {}
+	func Loop() error {
+		switch x {
+		case 1:
+			serial.Println("1")
+		}
+	}
+`
+	expected := `
+	void setup() {}
+	void loop() {
+		switch (x) {
+		case 1:
+			Serial.println("1");
+		}
+	}
+`
+	Validate(source, expected, t)
+}
+
+func Test_SwitchStmt_With_Break(t *testing.T) {
+	source := `package test
+	func Setup() error {}
+	func Loop() error {
+		switch x {
+		case 1:
+			serial.Println("1")
+			break
+		case 2:
+			serial.Println("1")
+		}
+	}
+`
+	expected := `
+	void setup() {}
+	void loop() {
+		switch (x) {
+		case 1:
+			Serial.println("1");
+			break;
+		case 2:
 			Serial.println("1");
 		}
 	}
