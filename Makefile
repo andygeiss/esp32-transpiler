@@ -1,6 +1,11 @@
 TS=$(shell date -u '+%Y/%m/%d %H:%M:%S')
 
-all: test
+all: install test
+
+install:
+	@echo $(TS) Installing...
+	@go get -u github.com/andygeiss/esp32-transpiler
+	@echo $(TS) Done.
 
 test:
 	@echo $(TS) Testing ...
