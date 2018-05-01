@@ -339,11 +339,29 @@ func handleStmt(stmt ast.Stmt) string {
 	case *ast.ExprStmt:
 		code += handleExprStmt(s)
 		code += ";"
+	case *ast.ForStmt:
+		code += handleForStmt(s)
 	case *ast.IfStmt:
 		code += handleIfStmt(s)
 	case *ast.SwitchStmt:
 		code += handleSwitchStmt(s)
 	}
+	return code
+}
+
+func handleForStmt(stmt *ast.ForStmt) string {
+	code := ""
+	if stmt.Init == nil && stmt.Post == nil {
+		code += "while"
+	} else {
+		code += "for"
+	}
+	code += "(" // stmt.Init
+	code += handleBinaryExpr(stmt.Cond) // stmt.Cond
+	code += "" // stmt.Post
+	code += ") {"
+	code += handleBlockStmt(stmt.Body) // stmt.Body
+	code += "}"
 	return code
 }
 

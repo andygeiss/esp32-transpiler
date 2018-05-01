@@ -376,3 +376,32 @@ func Test_SwitchStmt_With_Break(t *testing.T) {
 `
 	Validate(source, expected, t)
 }
+
+func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
+	source := `package test
+	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
+	func Setup() error {
+		serial.Begin(serial.BaudRate115200)
+		wifi.BeginEncrypted("SSID", "PASS")
+		for wifi.Status() != wifi.StatusConnected {
+			serial.Println("Connecting ...")
+		}
+		serial.Println("Connected!")
+		return nil
+	}	
+	func Loop() error {}
+`
+	expected := `
+	#include <WiFi.h>
+	void setup() {
+		Serial.begin(115200);
+		WiFi.begin("SSID","PASS");
+		while(WiFi.status()!=WL_CONNECTED){
+			Serial.println("Connecting...");
+		}
+		Serial.println("Connected!");
+	}
+	void loop() {}
+`
+	Validate(source, expected, t)
+}

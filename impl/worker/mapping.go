@@ -47,6 +47,7 @@ var (
 		"wifi.ScanNetworks":       "WiFi.scanNetworks",
 		"wifi.SetDNS":             "WiFi.setDNS",
 		"wifi.SSID":               "WiFi.SSID",
+		"wifi.Status":             "WiFi.status",
 		"wifi.StatusConnected":    "WL_CONNECTED",
 		"wifi.StatusIdle":         "WL_IDLE",
 		"Loop":                    "void loop",
@@ -55,7 +56,7 @@ var (
 )
 
 // Mapping specifies the api logic to apply transformation to a specific Golang identifier by reading simple JSON map.
-type Mapping struct {}
+type Mapping struct{}
 
 // NewMapping creates a new mapping and returns its address.
 func NewMapping() worker.Mapping {
