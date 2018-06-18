@@ -455,7 +455,7 @@ func Test_WiFiWebClient(t *testing.T) {
 		serial.Print("Connecting to ")
 		serial.Println(host)
 		serial.Print(" ...")
-		if (client.Connect(host, 443)) {
+		if (client.Connect(host, 443) == true) {
 			serial.Println(" Connected!")
 		} else {
 			serial.Println(" Failed!")
@@ -469,7 +469,7 @@ func Test_WiFiWebClient(t *testing.T) {
 		Serial.print("Connecting to");
 		Serial.println(host);
 		Serial.print(" ...");
-		if(client.connect(host, 443)){
+		if(client.connect(host, 443) == true){
 			Serial.println(" Connected!");
 		} else {
 			Serial.println(" Failed!");
