@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"io"
 	"strings"
+	"os"
 )
 
 const (
@@ -74,7 +75,7 @@ func (w *Worker) Start() error {
 		}
 	}
 	// Print the AST.
-	// ast.Fprint(os.Stderr, fset, file, nil)
+	ast.Fprint(os.Stderr, fset, file, nil)
 	return nil
 }
 
@@ -152,9 +153,17 @@ func handleExpr(expr ast.Expr) string {
 		code += handleCallExpr(e)
 	case *ast.Ident:
 		code += handleIdent(e)
+	case *ast.ParenExpr:
+		code += handleParenExpr(e)
 	case *ast.SelectorExpr:
 		code += handleSelectorExpr(e)
 	}
+	return code
+}
+
+func handleParenExpr (stmt *ast.ParenExpr) string {
+	code := ""
+	code += handleExpr(stmt.X)
 	return code
 }
 

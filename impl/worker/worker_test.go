@@ -471,7 +471,7 @@ func Test_WiFiWebClient(t *testing.T) {
 		Serial.print("Connecting to");
 		Serial.println(host);
 		Serial.print(" ...");
-		if(){
+		if(client.connect(host, 443){
 			Serial.println(" Connected!");
 		} else {
 			Serial.println(" Failed!");

@@ -33,6 +33,7 @@ var (
 		"timer.Delay":             "delay",
 		"wifi":                    "WiFi",
 		"wifi.Client":             "WiFiClient",
+		"client.Connect":          "client.connect",
 		"wifi.Begin":              "WiFi.begin",
 		"wifi.BeginEncrypted":     "WiFi.begin",
 		"wifi.BSSID":              "WiFi.BSSID",
