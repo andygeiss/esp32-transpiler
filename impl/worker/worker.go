@@ -74,7 +74,7 @@ func (w *Worker) Start() error {
 		}
 	}
 	// Print the AST.
-	//ast.Fprint(os.Stderr, fset, file, nil)
+	// ast.Fprint(os.Stderr, fset, file, nil)
 	return nil
 }
 
@@ -259,6 +259,8 @@ func handleGenDecl(decl ast.Decl) string {
 	switch gd.Tok {
 	case token.CONST:
 		code += "const "
+	case token.VAR:
+		code += ""
 	}
 	code += handleSpecs(gd.Specs)
 	return code
@@ -277,9 +279,13 @@ func handleIdent(expr ast.Expr) string {
 }
 
 func handleIfStmt(stmt *ast.IfStmt) string {
-	cond := handleBinaryExpr(stmt.Cond)
+	cond := handleExpr(stmt.Cond)
 	body := handleBlockStmt(stmt.Body)
 	code := fmt.Sprintf(`if (%s) { %s }`, cond, body)
+	if stmt.Else != nil {
+		tail := handleBlockStmt(stmt.Else.(*ast.BlockStmt))
+		code += fmt.Sprintf(" else { %s }", tail)
+	}
 	return code
 }
 
@@ -380,8 +386,10 @@ func handleValueSpec(spec ast.Spec) string {
 	code += handleValueSpecType(s.Type)
 	code += " "
 	code += handleValueSpecNames(s.Names)
-	code += " = "
-	code += handleValueSpecValues(s.Values)
+	if s.Values != nil {
+		code += " = "
+		code += handleValueSpecValues(s.Values)
+	}
 	return code
 }
 
@@ -396,6 +404,8 @@ func handleValueSpecNames(names []*ast.Ident) string {
 func handleValueSpecType(expr ast.Expr) string {
 	code := ""
 	switch t := expr.(type) {
+	case *ast.SelectorExpr:
+		code += handleSelectorExpr(t)
 	case *ast.Ident:
 		code += handleIdent(t)
 	}

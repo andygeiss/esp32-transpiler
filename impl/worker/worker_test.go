@@ -45,6 +45,7 @@ func Test_Function_Declaration(t *testing.T) {
 	void bar() {}	`
 	Validate(source, expected, t)
 }
+
 func Test_Function_Declaration_With_Args(t *testing.T) {
 	source := `package test
 	func foo(x int) {}
@@ -54,6 +55,7 @@ func Test_Function_Declaration_With_Args(t *testing.T) {
 	void bar(int y) {}	`
 	Validate(source, expected, t)
 }
+
 func Test_Const_String_Declaration(t *testing.T) {
 	source := `package test
 	const foo string = "bar"
@@ -63,6 +65,18 @@ func Test_Const_String_Declaration(t *testing.T) {
 	`
 	Validate(source, expected, t)
 }
+
+
+func Test_Var_String_Declaration(t *testing.T) {
+	source := `package test
+	var client wifi.Client
+	`
+	expected := `
+	WiFiClient client;
+	`
+	Validate(source, expected, t)
+}
+
 func Test_Function_With_Const_String_Declaration(t *testing.T) {
 	source := `package test
 	func foo() {
@@ -327,6 +341,32 @@ func Test_IfStmt_With_Condition_Const_And_BasicLit(t *testing.T) {
 	Validate(source, expected, t)
 }
 
+func Test_IfStmt_With_Else(t *testing.T) {
+	source := `package test
+	const maxX = 1
+	func Setup() error {}
+	func Loop() error {
+		if x == maxX {
+			serial.Println("1")
+		} else {
+			serial.Println("2")
+		}
+	}
+`
+	expected := `
+	const maxX = 1;
+	void setup() {}
+	void loop() {
+		if (x == maxX) {
+			Serial.println("1");
+		} else {
+			Serial.println("2");	
+		}
+	}
+`
+	Validate(source, expected, t)
+}
+
 func Test_SwitchStmt_With_Ident_And_BasicLit(t *testing.T) {
 	source := `package test
 	func Setup() error {}
@@ -403,5 +443,39 @@ func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
 	}
 	void loop() {}
 `
+	Validate(source, expected, t)
+}
+
+func Test_WiFiWebClient(t *testing.T) {
+	source := `package test
+	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
+	var client wifi.Client
+	func Setup() error {}
+	func Loop() error {
+		serial.Print("Connecting to ")
+		serial.Println(host)
+		serial.Print(" ...")
+		if (client.Connect(host, 443)) {
+			serial.Println(" Connected!")
+			return nil
+		} else {
+			serial.Println(" Failed!")
+		}
+		return nil
+	}
+`
+	expected := `#include <WiFi.h>
+	WiFiClient client;
+	voidsetup(){}
+	voidloop(){
+		Serial.print("Connecting to");
+		Serial.println(host);
+		Serial.print(" ...");
+		if(){
+			Serial.println(" Connected!");
+		} else {
+			Serial.println(" Failed!");
+		}
+	}`
 	Validate(source, expected, t)
 }

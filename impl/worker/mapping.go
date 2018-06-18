@@ -32,6 +32,7 @@ var (
 		"serial.Println":          "Serial.println",
 		"timer.Delay":             "delay",
 		"wifi":                    "WiFi",
+		"wifi.Client":             "WiFiClient",
 		"wifi.Begin":              "WiFi.begin",
 		"wifi.BeginEncrypted":     "WiFi.begin",
 		"wifi.BSSID":              "WiFi.BSSID",
