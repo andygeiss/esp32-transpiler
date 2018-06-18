@@ -8,7 +8,6 @@ import (
 	"go/token"
 	"io"
 	"strings"
-	"os"
 )
 
 const (
@@ -75,7 +74,7 @@ func (w *Worker) Start() error {
 		}
 	}
 	// Print the AST.
-	ast.Fprint(os.Stderr, fset, file, nil)
+	// ast.Fprint(os.Stderr, fset, file, nil)
 	return nil
 }
 

@@ -457,11 +457,9 @@ func Test_WiFiWebClient(t *testing.T) {
 		serial.Print(" ...")
 		if (client.Connect(host, 443)) {
 			serial.Println(" Connected!")
-			return nil
 		} else {
 			serial.Println(" Failed!")
 		}
-		return nil
 	}
 `
 	expected := `#include <WiFi.h>
@@ -471,7 +469,7 @@ func Test_WiFiWebClient(t *testing.T) {
 		Serial.print("Connecting to");
 		Serial.println(host);
 		Serial.print(" ...");
-		if(client.connect(host, 443){
+		if(client.connect(host, 443)){
 			Serial.println(" Connected!");
 		} else {
 			Serial.println(" Failed!");
