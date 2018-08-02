@@ -34,6 +34,7 @@ var (
 		"wifi":                    "WiFi",
 		"wifi.Client":             "WiFiClient",
 		"client.Connect":          "client.connect",
+		"client.Write":            "client.write",
 		"wifi.Begin":              "WiFi.begin",
 		"wifi.BeginEncrypted":     "WiFi.begin",
 		"wifi.BSSID":              "WiFi.BSSID",
