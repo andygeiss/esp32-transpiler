@@ -12,7 +12,12 @@ I needed to compile and flash the ESP32 before testing my code functionality by 
 This solution transpiles Golang into Arduino code, which can be compiled to an image by using the ESP32 toolchain.
 Now I am able to use a fully automated testing approach instead of doing it 100% manually.
 
-**Important**: The Transpiler only supports a small subset of the [Golang Language Specification](https://golang.org/ref/spec).
+**Important**: 
+
+The Transpiler only supports a small subset of the [Golang Language Specification](https://golang.org/ref/spec).
+Look at the [mapping](https://github.com/andygeiss/esp32-transpiler/blob/master/impl/worker/mapping.go) and the [tests](https://github.com/andygeiss/esp32-transpiler/blob/master/impl/worker/worker_test.go) to get the current functionality.
+It is also not possible to trigger the C/C++ Garbage Collection, because Golang handles it automatically "under the hood".
+Go strings will be transpiled to C constant char arrays, which could be handled on the stack.
 
 ## Installation
 
