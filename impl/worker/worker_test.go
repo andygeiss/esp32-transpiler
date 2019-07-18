@@ -3,7 +3,6 @@ package worker_test
 import (
 	"bytes"
 	"github.com/andygeiss/assert"
-	"github.com/andygeiss/assert/is"
 	"github.com/andygeiss/esp32-transpiler/impl/worker"
 	"strings"
 	"testing"
@@ -24,10 +23,10 @@ func Validate(source, expected string, t *testing.T) {
 	var in, out bytes.Buffer
 	in.WriteString(source)
 	wrk := worker.NewWorker(&in, &out, worker.NewMapping())
-	assert.That(t, wrk.Start(), is.Equal(nil))
+	assert.That(t, wrk.Start(), nil)
 	code := out.String()
 	tcode, texpected := Trim(code), Trim(expected)
-	assert.That(t, tcode, is.Equal(texpected))
+	assert.That(t, tcode, texpected)
 }
 
 func Test_Empty_Package(t *testing.T) {

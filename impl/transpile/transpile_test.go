@@ -3,7 +3,6 @@ package transpile_test
 import (
 	"bytes"
 	"github.com/andygeiss/assert"
-	"github.com/andygeiss/assert/is"
 	"github.com/andygeiss/esp32-transpiler/api/worker"
 	"github.com/andygeiss/esp32-transpiler/impl/transpile"
 	"io"
@@ -32,5 +31,5 @@ func TestTranspileErrorShouldBeNil(t *testing.T) {
 	worker := &mockupWorker{&in, &out}
 	trans := transpile.NewTranspiler(worker)
 	err := trans.Transpile()
-	assert.That(t, err, is.Equal(nil))
+	assert.That(t, err, nil)
 }
