@@ -1,9 +1,9 @@
-package worker_test
+package transpile_test
 
 import (
 	"bytes"
-	"github.com/andygeiss/assert"
-	"github.com/andygeiss/esp32-transpiler/impl/worker"
+	"esp32-transpiler/transpile"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -18,15 +18,20 @@ func Trim(s string) string {
 }
 
 // Validate the content of a given source with an expected outcome by using a string compare.
-// The Worker will be started and used to transform the source into an Arduino sketch format.
+// The defaultService will be started and used to transform the source into an Arduino sketch format.
 func Validate(source, expected string, t *testing.T) {
 	var in, out bytes.Buffer
 	in.WriteString(source)
-	wrk := worker.NewWorker(&in, &out, worker.NewMapping())
-	assert.That(t, wrk.Start(), nil)
-	code := out.String()
-	tcode, texpected := Trim(code), Trim(expected)
-	assert.That(t, tcode, texpected)
+	service := transpile.NewService(&in, &out)
+	err := service.Start()
+	got := out.String()
+	tgot, texpected := Trim(got), Trim(expected)
+	if !reflect.DeepEqual(err, nil) {
+		t.Fatalf("got %v, but expected %v", err, nil)
+	}
+	if !reflect.DeepEqual(err, nil) {
+		t.Fatalf("got %v, but expected %v", tgot, texpected)
+	}
 }
 
 func Test_Empty_Package(t *testing.T) {

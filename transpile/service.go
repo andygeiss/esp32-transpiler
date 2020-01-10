@@ -1,14 +1,18 @@
-package worker
+package transpile
 
 import (
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/api/worker"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"io"
 	"strings"
 )
+
+// Service specifies the api logic of transforming a source code format into another target format.
+type Service interface {
+	Start() error
+}
 
 const (
 	// ErrorWorkerReaderIsNil ...
@@ -17,37 +21,37 @@ const (
 	ErrorWorkerWriterIsNil = "Writer should not be nil"
 )
 
-var mapping worker.Mapping
-
-// Worker specifies the api logic of transforming a source code format into another target format.
-type Worker struct {
+// defaultService specifies the api logic of transforming a source code format into another target format.
+type defaultService struct {
 	in  io.Reader
 	out io.Writer
 }
 
-// NewWorker creates a a new worker and returns its address.
-func NewWorker(in io.Reader, out io.Writer, m worker.Mapping) worker.Worker {
-	mapping = m
-	return &Worker{in, out}
+// NewService creates a a new transpile and returns its address.
+func NewService(in io.Reader, out io.Writer) Service {
+	return &defaultService{
+		in:  in,
+		out: out,
+	}
 }
 
 // Start ...
-func (w *Worker) Start() error {
-	if w.in == nil {
+func (s *defaultService) Start() error {
+	if s.in == nil {
 		return fmt.Errorf("Error: %s", ErrorWorkerReaderIsNil)
 	}
-	if w.out == nil {
+	if s.out == nil {
 		return fmt.Errorf("Error: %s", ErrorWorkerWriterIsNil)
 	}
 	// Read tokens from file by using Go's parser.
 	fset := token.NewFileSet()
-	file, err := parser.ParseFile(fset, "source.go", w.in, 0)
+	file, err := parser.ParseFile(fset, "source.go", s.in, 0)
 	if err != nil {
 		return fmt.Errorf("ParseFile failed! %v", err)
 	}
 	// If source has no declarations then main it to an empty for loop.
 	if file.Decls == nil {
-		fmt.Fprint(w.out, "void loop() {} void setup() {}")
+		fmt.Fprint(s.out, "void loop() {} void setup() {}")
 		return nil
 	}
 	// Use Goroutines to work concurrently.
@@ -57,7 +61,7 @@ func (w *Worker) Start() error {
 	for i := 0; i < count; i++ {
 		dst[i] = make(chan string, 1)
 	}
-	// Start a worker with an individual channel for each declaration in the source file.
+	// Start a transpile with an individual channel for each declaration in the source file.
 	for i, decl := range file.Decls {
 		go handleDecl(i, decl, dst[i], done)
 	}
@@ -70,7 +74,7 @@ func (w *Worker) Start() error {
 	// Print the ordered result.
 	for i := 0; i < count; i++ {
 		for content := range dst[i] {
-			w.out.Write([]byte(content))
+			s.out.Write([]byte(content))
 		}
 	}
 	// Print the AST.
@@ -160,7 +164,7 @@ func handleExpr(expr ast.Expr) string {
 	return code
 }
 
-func handleParenExpr (stmt *ast.ParenExpr) string {
+func handleParenExpr(stmt *ast.ParenExpr) string {
 	code := ""
 	code += handleExpr(stmt.X)
 	return code
@@ -249,7 +253,9 @@ func handleFuncDeclName(ident *ast.Ident) string {
 		return code
 	}
 	code += ident.Name
-	code = mapping.Apply(code)
+	if val, ok := mapping[code]; ok {
+		code = val
+	}
 	return code
 }
 
@@ -302,7 +308,9 @@ func handleImportSpec(spec ast.Spec) string {
 	code := ""
 	if s.Name != nil {
 		name := handleIdent(s.Name)
-		name = mapping.Apply(name)
+		if val, ok := mapping[name]; ok {
+			name = val
+		}
 		if name != "" {
 			if name != "controller" {
 				code = "#include <" + name + ".h>\n"
@@ -321,7 +329,9 @@ func handleSelectorExpr(expr ast.Expr) string {
 	}
 	code += "."
 	code += handleIdent(s.Sel)
-	code = mapping.Apply(code)
+	if val, ok := mapping[code]; ok {
+		code = val
+	}
 	return code
 }
 
@@ -370,9 +380,9 @@ func handleForStmt(stmt *ast.ForStmt) string {
 	} else {
 		code += "for"
 	}
-	code += "(" // stmt.Init
+	code += "("                         // stmt.Init
 	code += handleBinaryExpr(stmt.Cond) // stmt.Cond
-	code += "" // stmt.Post
+	code += ""                          // stmt.Post
 	code += ") {"
 	code += handleBlockStmt(stmt.Body) // stmt.Body
 	code += "}"

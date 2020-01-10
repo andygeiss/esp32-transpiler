@@ -1,10 +1,9 @@
 package main
 
 import (
+	"esp32-transpiler/transpile"
 	"flag"
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/impl/transpile"
-	"github.com/andygeiss/esp32-transpiler/impl/worker"
 	"os"
 )
 
@@ -34,7 +33,7 @@ func printUsage() {
 	flag.PrintDefaults()
 	fmt.Print("\n")
 	fmt.Print("Example:\n")
-	fmt.Printf("\tesp32 -source impl/blink/controller.go -target impl/blink/controller.worker\n\n")
+	fmt.Printf("\tesp32 -source impl/blink/controller.go -target impl/blink/controller.transpile\n\n")
 }
 
 func safeTranspile(source, target string) {
@@ -53,9 +52,8 @@ func safeTranspile(source, target string) {
 		os.Exit(1)
 	}
 	// Transpiles the Golang source into Arduino sketch.
-	wrk := worker.NewWorker(in, out, worker.NewMapping())
-	trans := transpile.NewTranspiler(wrk)
-	if err := trans.Transpile(); err != nil {
+	service := transpile.NewService(in, out)
+	if err := service.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
 		os.Exit(1)
 	}
