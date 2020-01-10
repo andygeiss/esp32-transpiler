@@ -2,7 +2,7 @@ package transpile_test
 
 import (
 	"bytes"
-	"esp32-transpiler/transpile"
+	"github.com/andygeiss/esp32-transpiler/transpile"
 	"reflect"
 	"strings"
 	"testing"
