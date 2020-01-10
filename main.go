@@ -1,9 +1,9 @@
 package main
 
 import (
-	"esp32-transpiler/transpile"
 	"flag"
 	"fmt"
+	"github.com/andygeiss/esp32-transpiler/transpile"
 	"os"
 )
 
