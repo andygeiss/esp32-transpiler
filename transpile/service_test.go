@@ -2,10 +2,11 @@ package transpile_test
 
 import (
 	"bytes"
-	"github.com/andygeiss/esp32-transpiler/transpile"
-	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/andygeiss/esp32-transpiler/transpile"
+	"github.com/andygeiss/utils/assert"
 )
 
 // Trim removes all the whitespaces and returns a new string.
@@ -23,15 +24,10 @@ func Validate(source, expected string, t *testing.T) {
 	var in, out bytes.Buffer
 	in.WriteString(source)
 	service := transpile.NewService(&in, &out)
-	err := service.Start()
+	service.Start()
 	got := out.String()
 	tgot, texpected := Trim(got), Trim(expected)
-	if !reflect.DeepEqual(err, nil) {
-		t.Fatalf("got %v, but expected %v", err, nil)
-	}
-	if !reflect.DeepEqual(err, nil) {
-		t.Fatalf("got %v, but expected %v", tgot, texpected)
-	}
+	assert.That("validation failed", t, tgot, texpected)
 }
 
 func Test_Empty_Package(t *testing.T) {
