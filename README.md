@@ -1,5 +1,8 @@
 # ESP32 Transpiler
 
+[![](https://img.shields.io/github/license/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/blob/master/LICENSE)
+[![](https://img.shields.io/github/v/release/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/releases)
+[![](https://img.shields.io/github/go-mod/go-version/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler)
 [![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-transpiler)](https://goreportcard.com/report/github.com/andygeiss/esp32-transpiler)
 [![Build Status](https://travis-ci.org/andygeiss/esp32-transpiler.svg?branch=master)](https://travis-ci.org/andygeiss/esp32-transpiler)
 [![BCH compliance](https://bettercodehub.com/edge/badge/andygeiss/esp32-transpiler?branch=master)](https://bettercodehub.com/)
