@@ -1,10 +1,9 @@
 # ESP32 Transpiler
 
-[![](https://img.shields.io/github/license/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/blob/master/LICENSE)
-[![](https://img.shields.io/github/v/release/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/releases)
-[![](https://img.shields.io/github/go-mod/go-version/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler)
-[![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-transpiler)](https://goreportcard.com/report/github.com/andygeiss/esp32-transpiler)
-[![Build Status](https://travis-ci.org/andygeiss/esp32-transpiler.svg?branch=master)](https://travis-ci.org/andygeiss/esp32-transpiler)
+[![License](https://img.shields.io/github/license/andygeiss/esp32)](https://github.com/andygeiss/esp32-transpiler/blob/master/LICENSE)
+[![Releases](https://img.shields.io/github/v/release/andygeiss/esp32)](https://github.com/andygeiss/esp32-transpiler/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32)](https://goreportcard.com/report/github.com/andygeiss/esp32)
+[![Maintainability](https://api.codeclimate.com/v1/badges/90bf72e5a7b538c9e50e/maintainability)](https://codeclimate.com/github/andygeiss/esp32-transpiler/maintainability)
 
 ## Purpose
 
@@ -15,7 +14,7 @@ I needed to compile and flash the ESP32 before testing my code functionality by 
 This solution transpiles Golang into Arduino code, which can be compiled to an image by using the ESP32 toolchain.
 Now I am able to use a fully automated testing approach instead of doing it 100% manually.
 
-**Important**: 
+**Important**:
 
 The Transpiler only supports a small subset of the [Golang Language Specification](https://golang.org/ref/spec).
 Look at the [mapping](https://github.com/andygeiss/esp32-transpiler/blob/master/transpile/handlers/mapping.go) and the [tests](https://github.com/andygeiss/esp32-transpiler/blob/master/transpile/service_test.go) to get the current functionality.
