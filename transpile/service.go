@@ -2,10 +2,11 @@ package transpile
 
 import (
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/transpile/handlers"
 	"go/parser"
 	"go/token"
 	"io"
+
+	"github.com/andygeiss/esp32-transpiler/transpile/handlers"
 )
 
 // Service specifies the api logic of transforming a source code format into another target format.
@@ -42,17 +43,20 @@ func (s *defaultService) Start() error {
 	if s.out == nil {
 		return fmt.Errorf("Error: %s", ErrorWorkerWriterIsNil)
 	}
+
 	// Read tokens from file by using Go's parser.
 	fs := token.NewFileSet()
 	file, err := parser.ParseFile(fs, "source.go", s.in, 0)
 	if err != nil {
 		return fmt.Errorf("ParseFile failed! %v", err)
 	}
+
 	// If source has no declarations then main it to an empty for loop.
 	if file.Decls == nil {
 		_, _ = fmt.Fprint(s.out, "void loop() {} void setup() {}")
 		return nil
 	}
+
 	// Use Goroutines to work concurrently.
 	count := len(file.Decls)
 	done := make(chan bool, count)
@@ -60,16 +64,19 @@ func (s *defaultService) Start() error {
 	for i := 0; i < count; i++ {
 		dst[i] = make(chan string, 1)
 	}
+
 	// Start a transpile with an individual channel for each declaration in the source file.
 	for i, decl := range file.Decls {
 		go handlers.HandleDecl(decl, dst[i], done)
 	}
+
 	// Wait for all workers are done.
 	for i := 0; i < count; i++ {
 		select {
 		case <-done:
 		}
 	}
+
 	// Print the ordered result.
 	for i := 0; i < count; i++ {
 		for content := range dst[i] {

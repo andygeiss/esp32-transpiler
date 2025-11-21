@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/andygeiss/esp32-transpiler/transpile"
 	"os"
+
+	"github.com/andygeiss/esp32-transpiler/transpile"
 )
 
 func main() {
@@ -44,6 +45,7 @@ func safeTranspile(source, target string) {
 		os.Exit(1)
 	}
 	defer in.Close()
+
 	// Create the Arduino sketch file.
 	os.Remove(target)
 	out, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR|os.O_SYNC, 0666)
@@ -51,6 +53,7 @@ func safeTranspile(source, target string) {
 		fmt.Fprintf(os.Stderr, "Arduino sketch file [%s] could not be opened! %v", target, err)
 		os.Exit(1)
 	}
+
 	// Transpiles the Golang source into Arduino sketch.
 	service := transpile.NewService(in, out)
 	if err := service.Start(); err != nil {

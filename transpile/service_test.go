@@ -2,10 +2,11 @@ package transpile_test
 
 import (
 	"bytes"
-	"github.com/andygeiss/esp32-transpiler/transpile"
-	"github.com/andygeiss/utils/assert"
 	"strings"
 	"testing"
+
+	"github.com/andygeiss/cloud-native-utils/assert"
+	"github.com/andygeiss/esp32-transpiler/transpile"
 )
 
 // Trim removes all the whitespaces and returns a new string.
@@ -26,7 +27,7 @@ func Validate(source, expected string, t *testing.T) {
 	_ = service.Start()
 	got := out.String()
 	tg, te := Trim(got), Trim(expected)
-	assert.That("validation failed", t, tg, te)
+	assert.That(t, "validation failed", tg, te)
 }
 
 func Test_Empty_Package(t *testing.T) {
@@ -359,7 +360,7 @@ func Test_IfStmt_With_Else(t *testing.T) {
 		if (x == maxX) {
 			Serial.println("1");
 		} else {
-			Serial.println("2");	
+			Serial.println("2");
 		}
 	}
 `
@@ -427,7 +428,7 @@ func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
 		}
 		serial.Println("Connected!")
 		return nil
-	}	
+	}
 	func Loop() error {}
 `
 	expected := `
