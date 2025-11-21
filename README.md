@@ -21,14 +21,22 @@ Look at the [mapping](https://github.com/andygeiss/esp32-transpiler/blob/master/
 It is also not possible to trigger the C/C++ Garbage Collection, because Golang handles it automatically "under the hood".
 Go strings will be transpiled to C constant char arrays, which could be handled on the stack.
 
+### Prerequisites
+
+1. Install the latest version of [Go](https://golang.org/dl/).
+2. Install the latest version of [Just](https://github.com/casey/just).
+3. Include `$HOME/bin` in your `$PATH`.
+
 ## Installation
 
-    go get -u github.com/andygeiss/esp32-transpiler
+Clone the repository and install the `esp32-transpiler` binary into `$HOME/bin`:
+
+    just install
 
 ## Usage
 
-    Usage of esp32-transpiler:
-      -source string
-            Golang source file
-      -target string
-            Arduino sketch file
+Transpile a Golang source file into an Arduino sketch file:
+
+```bash
+    esp32-transpiler -source my_source.go -target my_target.ino
+```

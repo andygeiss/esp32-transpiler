@@ -1,0 +1,25 @@
+name: Continuous Integration
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+
+      - name: Set up Codacy script
+        run: curl -o get.sh -Ls https://coverage.codacy.com/get.sh
+
+      - name: Set up Just
+        uses: taiki-e/install-action@just
+
+      - name: Call just test
+        run: just test
+
+      - name: Upload to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: bash get.sh report --force-coverage-parser go -r .coverprofile.out
