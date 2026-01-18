@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=andygeiss&project=esp32-transpiler&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 # ESP32 Transpiler
 
 [![License](https://img.shields.io/github/license/andygeiss/esp32)](https://github.com/andygeiss/esp32-transpiler/blob/master/LICENSE)
