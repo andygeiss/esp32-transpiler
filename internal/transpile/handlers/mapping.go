@@ -18,6 +18,7 @@ var mapping = map[string]string{
 	"serial.BaudRate4800":        "4800",
 	"serial.BaudRate9600":        "9600",
 	"serial.BaudRate14400":       "14400",
+	"serial.BaudRate19200":       "19200",
 	"serial.BaudRate28800":       "28800",
 	"serial.BaudRate38400":       "38400",
 	"serial.BaudRate57600":       "57600",
