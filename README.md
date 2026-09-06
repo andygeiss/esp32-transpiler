@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/github/license/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/blob/master/LICENSE)
 [![Releases](https://img.shields.io/github/v/release/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-transpiler)](https://goreportcard.com/report/github.com/andygeiss/esp32-transpiler)
-[![Maintainability](https://api.codeclimate.com/v1/badges/90bf72e5a7b538c9e50e/maintainability)](https://codeclimate.com/github/andygeiss/esp32-transpiler/maintainability)
 
 `esp32-transpiler` turns a Go source file into an Arduino sketch for the ESP32.
 It is for people who would rather write their controller logic in Go and check
@@ -18,18 +17,22 @@ go install github.com/andygeiss/esp32-transpiler@latest
 ## Transpile a controller
 
 Write the controller in Go. `Setup` and `Loop` become the two functions the
-Arduino runtime calls:
+Arduino runtime calls, and the packages you import come from
+[esp32-controller](https://github.com/andygeiss/esp32-controller), which mirrors
+the Arduino calls in Go so the same code runs under `go test`:
 
 ```go
-package main
+package controller
 
-import serial "github.com/andygeiss/esp32/api/controller/serial"
+import "github.com/andygeiss/esp32-controller/serial"
 
+// Setup runs once when the board powers up.
 func Setup() error {
 	serial.Begin(serial.BaudRate115200)
 	return nil
 }
 
+// Loop runs over and over, as fast as it returns.
 func Loop() error {
 	serial.Println("hello")
 	return nil
@@ -45,7 +48,6 @@ esp32-transpiler -source controller.go -target controller.ino
 `controller.ino` now holds this, ready for the ESP32 toolchain:
 
 ```c
-#include <serial.h>
  void setup() {Serial.begin(115200);} void loop() {Serial.println("hello");}
 ```
 
@@ -72,6 +74,11 @@ Only a small part of the [Go language specification](https://go.dev/ref/spec).
 [`mapping.go`](internal/transpile/handlers/mapping.go) is the full list of names
 it rewrites, and [`service_test.go`](internal/transpile/service_test.go) shows
 every construct it handles.
+
+An import only becomes an `#include` when you give it a name:
+`import wifi "…/wifi"` writes `#include <WiFi.h>`, while a plain import writes
+nothing. Serial, pins and timers need no header on the ESP32, so import those
+without a name.
 
 Two things it will not do:
 
