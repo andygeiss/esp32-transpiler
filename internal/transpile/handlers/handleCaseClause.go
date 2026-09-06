@@ -6,15 +6,16 @@ import (
 )
 
 func handleCaseClause(cc *ast.CaseClause) string {
-	code := "case "
+	var code strings.Builder
+	code.WriteString("case ")
 	clauses := make([]string, 0)
 	for _, clause := range cc.List {
 		clauses = append(clauses, HandleExpr(clause))
 	}
-	code += strings.Join(clauses, ",")
-	code += ":"
+	code.WriteString(strings.Join(clauses, ","))
+	code.WriteString(":")
 	for _, body := range cc.Body {
-		code += handleStmt(body)
+		code.WriteString(handleStmt(body))
 	}
-	return code
+	return code.String()
 }

@@ -2,35 +2,39 @@ package transpile_test
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"strings"
 	"testing"
 
-	"github.com/andygeiss/cloud-native-utils/assert"
-	"github.com/andygeiss/esp32-transpiler/transpile"
+	"github.com/andygeiss/esp32-transpiler/internal/transpile"
 )
 
-// Trim removes all the whitespaces and returns a new string.
+// Trim removes every whitespace character, so a comparison ignores layout.
 func Trim(s string) string {
-	s = strings.Replace(s, " ", "", -1)
-	s = strings.Replace(s, "\n", "", -1)
-	s = strings.Replace(s, "\r", "", -1)
-	s = strings.Replace(s, "\t", "", -1)
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "\n", "")
+	s = strings.ReplaceAll(s, "\r", "")
+	s = strings.ReplaceAll(s, "\t", "")
 	return s
 }
 
-// Validate the content of a given source with an expected outcome by using a string compare.
-// The defaultService will be started and used to transform the source into an Arduino sketch format.
+// Validate transpiles source and compares the sketch against expected,
+// ignoring whitespace.
 func Validate(source, expected string, t *testing.T) {
+	t.Helper()
 	var in, out bytes.Buffer
 	in.WriteString(source)
-	service := transpile.NewService(&in, &out)
-	_ = service.Start()
-	got := out.String()
-	tg, te := Trim(got), Trim(expected)
-	assert.That(t, "validation failed", tg, te)
+	if err := transpile.NewService(&in, &out).Start(t.Context()); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	if got, want := Trim(out.String()), Trim(expected); got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
 }
 
 func Test_Empty_Package(t *testing.T) {
+	t.Parallel()
 	source := `package test`
 	expected := `void loop(){}
 	void setup() {}	`
@@ -38,6 +42,7 @@ func Test_Empty_Package(t *testing.T) {
 }
 
 func Test_Function_Declaration(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {}
 	func bar() {}
@@ -48,6 +53,7 @@ func Test_Function_Declaration(t *testing.T) {
 }
 
 func Test_Function_Declaration_With_Args(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo(x int) {}
 	func bar(y int) {}
@@ -58,6 +64,7 @@ func Test_Function_Declaration_With_Args(t *testing.T) {
 }
 
 func Test_Const_String_Declaration(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	const foo string = "bar"
 	`
@@ -68,6 +75,7 @@ func Test_Const_String_Declaration(t *testing.T) {
 }
 
 func Test_Var_String_Declaration(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	var client wifi.Client
 	`
@@ -78,6 +86,7 @@ func Test_Var_String_Declaration(t *testing.T) {
 }
 
 func Test_Function_With_Const_String_Declaration(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		const foo string = "bar"
@@ -91,6 +100,7 @@ func Test_Function_With_Const_String_Declaration(t *testing.T) {
 	Validate(source, expected, t)
 }
 func Test_Function_With_Var_String_Declaration(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		var foo string = "bar"
@@ -104,6 +114,7 @@ func Test_Function_With_Var_String_Declaration(t *testing.T) {
 	Validate(source, expected, t)
 }
 func Test_Function_With_Function_Call(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		bar()
@@ -117,6 +128,7 @@ func Test_Function_With_Function_Call(t *testing.T) {
 	Validate(source, expected, t)
 }
 func Test_Function_With_Function_Call_With_Args(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		bar(1,2,3)
@@ -130,6 +142,7 @@ func Test_Function_With_Function_Call_With_Args(t *testing.T) {
 	Validate(source, expected, t)
 }
 func Test_Function_With_Function_Call_With_String(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		bar("foo")
@@ -144,6 +157,7 @@ func Test_Function_With_Function_Call_With_String(t *testing.T) {
 }
 
 func Test_Function_With_Package_Function_Call(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		foo.Bar(1,"2")
@@ -157,6 +171,7 @@ func Test_Function_With_Package_Function_Call(t *testing.T) {
 	Validate(source, expected, t)
 }
 func Test_Function_With_Assignments(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		x = 1
@@ -175,6 +190,7 @@ func Test_Function_With_Assignments(t *testing.T) {
 }
 
 func Test_Function_With_Package_Selector_Assignments(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		x = bar()
@@ -193,6 +209,7 @@ func Test_Function_With_Package_Selector_Assignments(t *testing.T) {
 }
 
 func Test_Function_Ident_Mapping(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		serial.Begin()
@@ -206,6 +223,7 @@ func Test_Function_Ident_Mapping(t *testing.T) {
 	Validate(source, expected, t)
 }
 func Test_Function_With_Ident_Param(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		foo.Bar(1,"2",digital.Low)
@@ -220,6 +238,7 @@ func Test_Function_With_Ident_Param(t *testing.T) {
 }
 
 func Test_Function_With_Function_Param(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func foo() {
 		serial.Println(wifi.LocalIP())
@@ -234,6 +253,7 @@ func Test_Function_With_Function_Param(t *testing.T) {
 }
 
 func Test_Package_Import(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	import "github.com/andygeiss/esp32-mqtt/api/controller"
 	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
@@ -247,6 +267,7 @@ func Test_Package_Import(t *testing.T) {
 }
 
 func Test_Package_Import_But_Ignore_Controller(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	import controller "github.com/andygeiss/esp32-controller"
 	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
@@ -260,6 +281,7 @@ func Test_Package_Import_But_Ignore_Controller(t *testing.T) {
 }
 
 func Test_IfStmt_With_Condition_BasicLit_And_BasicLit(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -280,6 +302,7 @@ func Test_IfStmt_With_Condition_BasicLit_And_BasicLit(t *testing.T) {
 }
 
 func Test_IfStmt_With_Condition_Ident_And_BasicLit(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -300,6 +323,7 @@ func Test_IfStmt_With_Condition_Ident_And_BasicLit(t *testing.T) {
 }
 
 func Test_IfStmt_With_Condition_CallExpr_And_BasicLit(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -320,6 +344,7 @@ func Test_IfStmt_With_Condition_CallExpr_And_BasicLit(t *testing.T) {
 }
 
 func Test_IfStmt_With_Condition_Const_And_BasicLit(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	const maxX = 1
 	func Setup() error {}
@@ -342,6 +367,7 @@ func Test_IfStmt_With_Condition_Const_And_BasicLit(t *testing.T) {
 }
 
 func Test_IfStmt_With_Else(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	const maxX = 1
 	func Setup() error {}
@@ -368,6 +394,7 @@ func Test_IfStmt_With_Else(t *testing.T) {
 }
 
 func Test_SwitchStmt_With_Ident_And_BasicLit(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -390,6 +417,7 @@ func Test_SwitchStmt_With_Ident_And_BasicLit(t *testing.T) {
 }
 
 func Test_SwitchStmt_With_Break(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	func Setup() error {}
 	func Loop() error {
@@ -418,6 +446,7 @@ func Test_SwitchStmt_With_Break(t *testing.T) {
 }
 
 func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
 	func Setup() error {
@@ -447,6 +476,7 @@ func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
 }
 
 func Test_WiFiWebClient(t *testing.T) {
+	t.Parallel()
 	source := `package test
 	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
 	var client wifi.Client
@@ -476,4 +506,49 @@ func Test_WiFiWebClient(t *testing.T) {
 		}
 	}`
 	Validate(source, expected, t)
+}
+
+func Test_Nil_Reader_Is_An_Error(t *testing.T) {
+	t.Parallel()
+	var out bytes.Buffer
+	err := transpile.NewService(nil, &out).Start(t.Context())
+	if !errors.Is(err, transpile.ErrNilReader) {
+		t.Errorf("got %v, want %v", err, transpile.ErrNilReader)
+	}
+}
+
+func Test_Nil_Writer_Is_An_Error(t *testing.T) {
+	t.Parallel()
+	var in bytes.Buffer
+	err := transpile.NewService(&in, nil).Start(t.Context())
+	if !errors.Is(err, transpile.ErrNilWriter) {
+		t.Errorf("got %v, want %v", err, transpile.ErrNilWriter)
+	}
+}
+
+func Test_Broken_Source_Writes_Nothing(t *testing.T) {
+	t.Parallel()
+	var in, out bytes.Buffer
+	in.WriteString("package test\nfunc foo( {}")
+	if err := transpile.NewService(&in, &out).Start(t.Context()); err == nil {
+		t.Fatal("got no error, want a parse error")
+	}
+	if out.Len() != 0 {
+		t.Errorf("got %q written, want nothing", out.String())
+	}
+}
+
+func Test_Cancelled_Context_Writes_Nothing(t *testing.T) {
+	t.Parallel()
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	var in, out bytes.Buffer
+	in.WriteString("package test\nfunc foo() {}")
+	err := transpile.NewService(&in, &out).Start(ctx)
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("got %v, want %v", err, context.Canceled)
+	}
+	if out.Len() != 0 {
+		t.Errorf("got %q written, want nothing", out.String())
+	}
 }

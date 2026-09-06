@@ -1,3 +1,4 @@
-.coverprofile.out
+.env
 bin
+esp32-transpiler
 testdata

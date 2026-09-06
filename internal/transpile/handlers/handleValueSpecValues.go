@@ -1,14 +1,17 @@
 package handlers
 
-import "go/ast"
+import (
+	"go/ast"
+	"strings"
+)
 
 func handleValueSpecValues(values []ast.Expr) string {
-	code := ""
+	var code strings.Builder
 	for _, value := range values {
 		switch v := value.(type) {
 		case *ast.BasicLit:
-			code += handleBasicLit(v)
+			code.WriteString(handleBasicLit(v))
 		}
 	}
-	return code
+	return code.String()
 }
