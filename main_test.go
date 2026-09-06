@@ -12,7 +12,7 @@ import (
 // One Go source and the whole sketch it transpiles to.
 const (
 	goSource = "package test\nfunc foo() {}\n"
-	sketch   = "void foo() {}"
+	sketch   = "void foo() {}\n"
 )
 
 // writeSource puts a Go source file in a fresh directory and returns its path.
@@ -172,5 +172,62 @@ func TestRun_BrokenSourceLeavesTheOldSketchIntact(t *testing.T) {
 	}
 	if string(got) != old {
 		t.Errorf("got %q, want the old sketch %q", got, old)
+	}
+}
+
+func TestRun_ASourceThatIsAlsoTheTargetIsRefused(t *testing.T) {
+	t.Parallel()
+	source := writeSource(t, goSource)
+	var stdout, stderr bytes.Buffer
+
+	err := run(t.Context(), []string{"-source", source, "-target", source}, &stdout, &stderr)
+
+	if !errors.Is(err, errUsage) {
+		t.Fatalf("got %v, want %v", err, errUsage)
+	}
+	if stderr.Len() == 0 {
+		t.Error("got nothing on stderr, want a reason")
+	}
+	got, err := os.ReadFile(source)
+	if err != nil {
+		t.Fatalf("reading the source: %v", err)
+	}
+	if string(got) != goSource {
+		t.Errorf("got %q, want the source left alone", got)
+	}
+}
+
+// The same file reached two ways is still the same file.
+func TestRun_ASourceThatIsTheTargetByAnotherNameIsRefused(t *testing.T) {
+	t.Parallel()
+	source := writeSource(t, goSource)
+	alias := filepath.Join(filepath.Dir(source), ".", filepath.Base(source))
+	var stdout, stderr bytes.Buffer
+
+	if err := run(t.Context(), []string{"-source", source, "-target", alias}, &stdout, &stderr); !errors.Is(err, errUsage) {
+		t.Fatalf("got %v, want %v", err, errUsage)
+	}
+}
+
+func TestRun_AnUnsupportedConstructIsNotAUsageError(t *testing.T) {
+	t.Parallel()
+	source := writeSource(t, "package test\nfunc Loop() error {\n\tgo f()\n}\n")
+	target := filepath.Join(filepath.Dir(source), "sketch.ino")
+	var stdout, stderr bytes.Buffer
+
+	err := run(t.Context(), []string{"-source", source, "-target", target}, &stdout, &stderr)
+
+	if err == nil {
+		t.Fatal("got no error, want one")
+	}
+	if errors.Is(err, errUsage) {
+		t.Errorf("got %v, want a plain error so the tool exits 1", err)
+	}
+	// The error names the file the user gave, not the one the parser was told.
+	if !strings.Contains(err.Error(), filepath.Base(source)) {
+		t.Errorf("got %q, want it to name %q", err, filepath.Base(source))
+	}
+	if _, err := os.Stat(target); !os.IsNotExist(err) {
+		t.Error("got a sketch, want none written")
 	}
 }

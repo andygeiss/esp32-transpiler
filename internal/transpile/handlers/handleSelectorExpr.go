@@ -2,17 +2,12 @@ package handlers
 
 import "go/ast"
 
-func handleSelectorExpr(expr ast.Expr) string {
-	s := expr.(*ast.SelectorExpr)
-	code := ""
-	switch x := s.X.(type) {
-	case *ast.Ident:
-		code += handleIdent(x)
-	}
-	code += "."
-	code += handleIdent(s.Sel)
+// handleSelectorExpr writes a.B, whatever a is, and then asks mapping.go
+// whether the whole of it is a name the Arduino spells differently.
+func handleSelectorExpr(s *ast.SelectorExpr) string {
+	code := HandleExpr(s.X) + "." + handleIdent(s.Sel)
 	if val, ok := mapping[code]; ok {
-		code = val
+		return val
 	}
 	return code
 }

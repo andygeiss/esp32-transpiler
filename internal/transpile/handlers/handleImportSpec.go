@@ -2,19 +2,20 @@ package handlers
 
 import "go/ast"
 
-func handleImportSpec(spec ast.Spec) string {
-	s := spec.(*ast.ImportSpec)
-	code := ""
-	if s.Name != nil {
-		name := handleIdent(s.Name)
-		if val, ok := mapping[name]; ok {
-			name = val
-		}
-		if name != "" {
-			if name != "controller" {
-				code = "#include <" + name + ".h>\n"
-			}
-		}
+// handleImportSpec turns a named import into the header the Arduino needs.
+// A plain import names nothing to include: serial, pins and timers are in the
+// ESP32 core already. The controller package itself is Go-only scaffolding.
+func handleImportSpec(s *ast.ImportSpec) string {
+	if s.Name == nil {
+		return ""
 	}
-	return code
+	name := s.Name.Name
+	switch name {
+	case "_", ".", "controller":
+		return ""
+	}
+	if val, ok := mapping[name]; ok {
+		name = val
+	}
+	return "#include <" + name + ".h>\n"
 }

@@ -2,14 +2,14 @@ package handlers
 
 import "go/ast"
 
-func handleIdent(expr ast.Expr) string {
-	ident := expr.(*ast.Ident)
-	code := ""
+func handleIdent(ident *ast.Ident) string {
 	switch ident.Name {
 	case "string":
-		code += "char*"
-	default:
-		code += ident.Name
+		// const, because what a Go string holds is a literal in the sketch's
+		// flash and C++ will not hand one out as a writable char*.
+		return "const char*"
+	case "nil":
+		return "nullptr"
 	}
-	return code
+	return ident.Name
 }

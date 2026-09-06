@@ -3,10 +3,9 @@ package handlers
 import "go/ast"
 
 func handleDeclStmt(stmt *ast.DeclStmt) string {
-	code := ""
-	switch decl := stmt.Decl.(type) {
-	case *ast.GenDecl:
-		code += handleGenDecl(decl)
+	gd, ok := stmt.Decl.(*ast.GenDecl)
+	if !ok {
+		unsupported(stmt.Decl, "%T inside a function", stmt.Decl)
 	}
-	return code
+	return handleGenDecl(gd)
 }

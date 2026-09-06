@@ -1,14 +1,11 @@
 package handlers
 
-import (
-	"go/ast"
-	"strings"
-)
+import "go/ast"
 
-func handleValueSpecNames(names []*ast.Ident) string {
-	var code strings.Builder
+func handleValueSpecNames(names []*ast.Ident) []string {
+	out := make([]string, 0, len(names))
 	for _, name := range names {
-		code.WriteString(handleIdent(name))
+		out = append(out, name.Name)
 	}
-	return code.String()
+	return out
 }

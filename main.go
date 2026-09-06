@@ -72,6 +72,12 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		fs.Usage()
 		return errUsage
 	}
+	// Writing the sketch over the Go it came from would leave nothing to
+	// transpile the next time.
+	if *source != "-" && *target != "-" && sameFile(*source, *target) {
+		fmt.Fprintln(stderr, "esp32-transpiler: -source and -target name the same file")
+		return errUsage
+	}
 
 	in, err := open(*source)
 	if err != nil {
@@ -80,8 +86,10 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 	defer in.Close()
 
 	var sketch bytes.Buffer
-	if err := transpile.NewService(in, &sketch).Start(ctx); err != nil {
-		return fmt.Errorf("transpiling %s: %w", *source, err)
+	// The error already names the source and the line it stopped on, the way
+	// a compiler does, so it goes out as it is.
+	if err := transpile.NewService(sourceName(*source), in, &sketch).Start(ctx); err != nil {
+		return err
 	}
 
 	// Nothing is written after a Ctrl-C, so an interrupted run leaves the old
@@ -90,6 +98,29 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		return fmt.Errorf("interrupted before writing %s: %w", *target, err)
 	}
 	return write(*target, sketch.Bytes(), stdout)
+}
+
+// sourceName is what diagnostics call the source. Standard input has no name
+// of its own.
+func sourceName(source string) string {
+	if source == "-" {
+		return "<stdin>"
+	}
+	return source
+}
+
+// sameFile reports whether two names reach one file, whatever route they take
+// to it. A target that is not there yet cannot be the source.
+func sameFile(a, b string) bool {
+	ai, err := os.Stat(a)
+	if err != nil {
+		return false
+	}
+	bi, err := os.Stat(b)
+	if err != nil {
+		return false
+	}
+	return os.SameFile(ai, bi)
 }
 
 // open returns the source. Standard input has no file to close, so it gets a
@@ -146,5 +177,25 @@ func version() string {
 	if v := info.Main.Version; v != "" && v != "(devel)" {
 		return v
 	}
-	return "unknown" // no VCS metadata to fall back on
+	// A build out of a checkout has no tag, so the commit it came from is the
+	// next best answer.
+	var revision, modified string
+	for _, s := range info.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			revision = s.Value
+		case "vcs.modified":
+			modified = s.Value
+		}
+	}
+	if revision == "" {
+		return "unknown" // no VCS metadata to fall back on
+	}
+	if len(revision) > 12 {
+		revision = revision[:12]
+	}
+	if modified == "true" {
+		return "devel-" + revision + "-dirty"
+	}
+	return "devel-" + revision
 }

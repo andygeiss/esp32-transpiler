@@ -3,26 +3,30 @@ package handlers
 import "go/ast"
 
 func handleStmt(stmt ast.Stmt) string {
-	code := ""
 	switch s := stmt.(type) {
 	case *ast.AssignStmt:
-		code += handleAssignStmt(s)
-		code += ";"
+		return handleAssignStmt(s) + ";"
 	case *ast.BranchStmt:
-		code += handleBranchStmt()
+		return handleBranchStmt(s)
 	case *ast.CaseClause:
-		code += handleCaseClause(s)
+		return handleCaseClause(s)
 	case *ast.DeclStmt:
-		code += handleDeclStmt(s)
+		return handleDeclStmt(s)
 	case *ast.ExprStmt:
-		code += handleExprStmt(s)
-		code += ";"
+		return handleExprStmt(s) + ";"
 	case *ast.ForStmt:
-		code += handleForStmt(s)
+		return handleForStmt(s)
 	case *ast.IfStmt:
-		code += handleIfStmt(s)
+		return handleIfStmt(s)
+	case *ast.IncDecStmt:
+		return handleIncDecStmt(s) + ";"
+	case *ast.ReturnStmt:
+		return handleReturnStmt(s)
 	case *ast.SwitchStmt:
-		code += handleSwitchStmt(s)
+		return handleSwitchStmt(s)
+	case *ast.EmptyStmt:
+		return ""
 	}
-	return code
+	unsupported(stmt, "%s", describe(stmt))
+	return ""
 }

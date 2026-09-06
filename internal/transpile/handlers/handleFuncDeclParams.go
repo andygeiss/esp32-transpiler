@@ -6,21 +6,20 @@ import (
 )
 
 func handleFuncDeclParams(t *ast.FuncType) string {
-	code := ""
-	if t.Params == nil || t.Params.List == nil {
-		return code
+	if t.Params == nil || len(t.Params.List) == 0 {
+		return ""
 	}
-	values := make([]string, 0)
+	values := make([]string, 0, len(t.Params.List))
 	for _, field := range t.Params.List {
-		ftype := ""
-		switch ft := field.Type.(type) {
-		case *ast.Ident:
-			ftype = handleIdent(ft)
+		ftype := handleType(field.Type)
+		if len(field.Names) == 0 {
+			// C++ lets a parameter go unnamed too.
+			values = append(values, ftype)
+			continue
 		}
-		for _, names := range field.Names {
-			values = append(values, ftype+" "+names.Name)
+		for _, name := range field.Names {
+			values = append(values, ftype+" "+name.Name)
 		}
 	}
-	code += strings.Join(values, ",")
-	return code
+	return strings.Join(values, ",")
 }

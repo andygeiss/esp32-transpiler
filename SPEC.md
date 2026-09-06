@@ -11,8 +11,11 @@ tested Go into the sketch that ships.
 **Guardrails:** The tool covers a small part of the Go language on purpose.
 [`mapping.go`](internal/transpile/handlers/mapping.go) is the whole Go-to-Arduino
 contract and [`service_test.go`](internal/transpile/service_test.go) is what
-proves it, so changing either changes what the tool promises. No baseline rule is
-waived; the README says so.
+proves it, so changing either changes what the tool promises. Everything outside
+that part is refused by name and line, and no sketch is written: a construct the
+tool passes over silently would reach the board as a sketch that compiles and
+behaves differently from the Go, and finding that out on the board is what this
+tool exists to avoid. No baseline rule is waived; the README says so.
 
 A release number answers one question: which
 [esp32-controller](https://github.com/andygeiss/esp32-controller) release this

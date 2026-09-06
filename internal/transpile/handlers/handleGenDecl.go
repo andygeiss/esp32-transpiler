@@ -5,15 +5,14 @@ import (
 	"go/token"
 )
 
-func handleGenDecl(decl ast.Decl) string {
-	gd := decl.(*ast.GenDecl)
-	code := ""
+func handleGenDecl(gd *ast.GenDecl) string {
+	prefix := ""
 	switch gd.Tok {
 	case token.CONST:
-		code += "const "
-	case token.VAR:
-		code += ""
+		prefix = "const "
+	case token.IMPORT, token.VAR:
+	case token.TYPE:
+		unsupported(gd, "a type declaration")
 	}
-	code += handleSpecs(gd.Specs)
-	return code
+	return handleSpecs(gd.Specs, prefix)
 }
