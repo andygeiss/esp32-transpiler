@@ -255,10 +255,10 @@ func Test_Function_With_Function_Param(t *testing.T) {
 func Test_Package_Import(t *testing.T) {
 	t.Parallel()
 	source := `package test
-	import "github.com/andygeiss/esp32-mqtt/api/controller"
-	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
-	import "github.com/andygeiss/esp32/api/controller/timer"
-	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
+	import "github.com/andygeiss/esp32-controller"
+	import "github.com/andygeiss/esp32-controller/serial"
+	import "github.com/andygeiss/esp32-controller/timer"
+	import wifi "github.com/andygeiss/esp32-controller/wifi"
 	`
 	expected := `
 	#include <WiFi.h>
@@ -270,9 +270,9 @@ func Test_Package_Import_But_Ignore_Controller(t *testing.T) {
 	t.Parallel()
 	source := `package test
 	import controller "github.com/andygeiss/esp32-controller"
-	import "github.com/andygeiss/esp32-mqtt/api/controller/serial"
-	import "github.com/andygeiss/esp32/api/controller/timer"
-	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
+	import "github.com/andygeiss/esp32-controller/serial"
+	import "github.com/andygeiss/esp32-controller/timer"
+	import wifi "github.com/andygeiss/esp32-controller/wifi"
 	`
 	expected := `
 	#include <WiFi.h>
@@ -448,7 +448,7 @@ func Test_SwitchStmt_With_Break(t *testing.T) {
 func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
 	t.Parallel()
 	source := `package test
-	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
+	import wifi "github.com/andygeiss/esp32-controller/wifi"
 	func Setup() error {
 		serial.Begin(serial.BaudRate115200)
 		wifi.BeginEncrypted("SSID", "PASS")
@@ -478,7 +478,7 @@ func Test_ForLoop_WithoutInit_And_Post_Transpiles_To_While(t *testing.T) {
 func Test_WiFiWebClient(t *testing.T) {
 	t.Parallel()
 	source := `package test
-	import wifi "github.com/andygeiss/esp32/api/controller/wifi"
+	import wifi "github.com/andygeiss/esp32-controller/wifi"
 	var client wifi.Client
 	func Setup() error {}
 	func Loop() error {
