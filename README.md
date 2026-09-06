@@ -14,6 +14,10 @@ it with `go test` than flash a board to find out whether it works.
 go install github.com/andygeiss/esp32-transpiler@latest
 ```
 
+Version numbers track [esp32-controller](https://github.com/andygeiss/esp32-controller):
+the same number on both means this transpiler covers every Arduino call that
+version of the controller exports.
+
 ## Transpile a controller
 
 Write the controller in Go. `Setup` and `Loop` become the two functions the
