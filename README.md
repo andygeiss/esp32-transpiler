@@ -2,7 +2,6 @@
 
 [![License](https://img.shields.io/github/license/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/blob/master/LICENSE)
 [![Releases](https://img.shields.io/github/v/release/andygeiss/esp32-transpiler)](https://github.com/andygeiss/esp32-transpiler/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-transpiler)](https://goreportcard.com/report/github.com/andygeiss/esp32-transpiler)
 
 `esp32-transpiler` turns a Go source file into an Arduino sketch for the ESP32.
 It is for people who would rather write their controller logic in Go and check
